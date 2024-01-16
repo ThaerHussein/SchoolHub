@@ -1,8 +1,17 @@
 # SchoolHub
 
+for part one in the word document:
+Part 1- Extract the requirements in simple sentences(use the word).
+•	Create two views one for grades and one to fill the students
+•	Validate all fields to be filled 
+•	Validate that the text filed for number of students takes only numbers
+•	Ensure that when we go to view 2 it will dynamically generate text fields based on the number of students 
+
+other parts in the code
 ## Overview
 
 The Grade and Student Information System is a web-based application that allows users to manage grade information and student data for various cities and schools. This system consists of two main views: 
+
 
 1. **Create Grade View**: This view enables users to create new grades, including details such as city name, school name, grade name, and the number of students. The system also provides the functionality to check for existing cities and schools in the database.
 
