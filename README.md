@@ -13,11 +13,11 @@ The Grade and Student Information System is a web-based application that allows 
 To use the Grade and Student Information System, follow these steps:
 
 1. Clone the repository to your local machine:
-git clone https://github.com/your-username/grade-student-system.git
+git clone [https://github.com/your-username/grade-student-system.git](https://github.com/ThaerHussein/SchoolHub.git)
 
-
-2. Access the system through your web browser at `http://localhost:5500/index.html`. and `http://127.0.0.1:5500/form2.html`
-
+2. To run the application you should go to VS code and right click on the file and click on run on the live server and you should run the spring boot project first
+   
+3. Access the system through your web browser at `http://localhost:5500/index.html`. and `http://127.0.0.1:5500/form2.html`
 ## Create Grade View
 
 ### Accessing the Create Grade View
