@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <title>Form 2</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <!-- Modal dialogs here... -->
+
+    <div class="container">
+      <header class="header">
+        <h1 id="title" class="text-center">Form 2</h1>
+      </header>
+      <div class="form-wrap">
+        <form id="form2">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Dropdown1 (City)</label>
+                <select
+                  id="dropdown1"
+                  name="dropdown1"
+                  class="form-control"
+                  required
+                >
+                  <option disabled selected value>Select City</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Dropdown2 (School)</label>
+                <select
+                  id="dropdown2"
+                  name="dropdown2"
+                  class="form-control"
+                  required
+                >
+                  <option disabled selected value>Select School</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Dropdown3 (Grade)</label>
+                <select
+                  id="dropdown3"
+                  name="dropdown3"
+                  class="form-control"
+                  required
+                >
+                  <option disabled selected value>Select Grade</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-2">
+              <button id="view" class="btn btn-primary btn-block">View</button>
+            </div>
+          </div>
+
+          <div id="studentFields"></div>
+
+          <div class="row">
+            <div class="col-md-2">
+              <button id="save" class="btn btn-primary btn-block" disabled>
+                Save
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Customized alert box -->
+    <div
+      id="customAlert"
+      class="alert alert-dismissible fade show"
+      role="alert"
+      style="display: none"
+    >
+      <button
+        type="button"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <strong id="alertMessage"></strong>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+    $(document).ready(function () {
+        var numberOfStudents = 0;
+        var selectedCity; // Declare selectedCity globally
+
+        function populateCityDropdown() {
+            $.ajax({
+                url: "http://localhost:8080/school-Hub/api/v1/city",
+                type: "GET",
+                success: function (response) {
+                    var dropdown1 = $("#dropdown1");
+                    dropdown1.empty();
+                    dropdown1.append(
+                            $("<option disabled selected value>Select City</option>")
+                    );
+                    $.each(response.data, function (key, value) {
+                        dropdown1.append(
+                                $(
+                                        '<option value="' +
+                                        value.cityName +
+                                        '">' +
+                                        value.cityName +
+                                        "</option>"
+                                )
+                        );
+                    });
+                },
+                error: function (xhr) {
+                    console.error(xhr);
+                },
+            });
+        }
+
+        populateCityDropdown();
+
+        function populateSchoolDropdown(cityName) {
+            selectedCity = cityName; // Update the selectedCity variable
+            $.ajax({
+                url:
+                        "http://localhost:8080/school-Hub/api/v1/school/by-city?cityName=" +
+                        encodeURIComponent(cityName),
+                type: "GET",
+                success: function (response) {
+                    var dropdown2 = $("#dropdown2");
+                    dropdown2.empty();
+                    dropdown2.append(
+                            $("<option disabled selected value>Select School</option>")
+                    );
+                    $.each(response.data, function (key, value) {
+                        dropdown2.append(
+                                $(
+                                        '<option value="' +
+                                        value.schoolName +
+                                        '">' +
+                                        value.schoolName +
+                                        "</option>"
+                                )
+                        );
+                    });
+                },
+                error: function (xhr) {
+                    console.error(xhr);
+                },
+            });
+        }
+
+        function populateGradeDropdown(schoolName) {
+            $.ajax({
+                url:
+                        "http://localhost:8080/school-Hub/api/v1/grade/by-school-and-city?schoolName=" +
+                        encodeURIComponent(schoolName) +
+                        "&cityName=" +
+                        encodeURIComponent(selectedCity), // Include selectedCity
+                type: "GET",
+                success: function (response) {
+                    var dropdown3 = $("#dropdown3");
+                    dropdown3.empty();
+                    dropdown3.append(
+                            $("<option disabled selected value>Select Grade</option>")
+                    );
+                    $.each(response.data, function (key, value) {
+                        dropdown3.append(
+                                $(
+                                        '<option value="' +
+                                        value.gradeName +
+                                        '">' +
+                                        value.gradeName +
+                                        "</option>"
+                                )
+                        );
+                    });
+
+                    // Update numberOfStudents with the new value
+                    numberOfStudents = parseInt(response.data[0].numberOfStudents);
+
+                    // Enable or disable the "Save" button based on numberOfStudents
+                    if (numberOfStudents > 0) {
+                        $("#save").prop("disabled", true);
+                    } else {
+                        $("#save").prop("disabled", false);
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr);
+                },
+            });
+        }
+
+        $("#view").click(function (event) {
+            event.preventDefault();
+
+            var selectedGrade = $("#dropdown3").val();
+            var selectedSchool = $("#dropdown2").val();
+
+            // Check if there are existing students for the selected grade, school, and city
+            $.ajax({
+                url:
+                        "http://localhost:8080/school-Hub/api/v1/student/by-grade-school-and-city?gradeName=" +
+                        encodeURIComponent(selectedGrade) +
+                        "&schoolName=" +
+                        encodeURIComponent(selectedSchool) +
+                        "&cityName=" +
+                        encodeURIComponent(selectedCity), // Include selectedCity
+                type: "GET",
+                success: function (response) {
+                    if (response.data.length > 0) {
+                        // If there are existing students, populate the form fields
+                        numberOfStudents = response.data.length;
+                        generateStudentFields(numberOfStudents);
+
+                        // Fill the form fields with existing student names
+                        for (var i = 1; i <= numberOfStudents; i++) {
+                            $("#studentName" + i).val(response.data[i - 1].studentName);
+                        }
+
+                        // Disable the "Save" button
+                        $("#save").prop("disabled", true);
+                    } else {
+                        // If no existing students, generate empty form fields
+                        generateStudentFields(numberOfStudents);
+
+                        // Enable the "Save" button
+                        $("#save").prop("disabled", false);
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr);
+                },
+            });
+        });
+
+        function generateStudentFields(numberOfStudents) {
+            var studentFields = $("#studentFields");
+            studentFields.empty();
+
+            for (var i = 1; i <= numberOfStudents; i++) {
+                var studentField = '<div class="row">';
+                studentField += '<div class="col-md-12">';
+                studentField += '<div class="form-group">';
+                studentField +=
+                        '<label for="studentName' +
+                        i +
+                        '">Student ' +
+                        i +
+                        " Name</label>";
+                studentField +=
+                        '<input type="text" name="studentName' +
+                        i +
+                        '" id="studentName' +
+                        i +
+                        '" class="form-control" placeholder="Enter student ' +
+                        i +
+                        ' name" required />';
+                studentField += "</div>";
+                studentField += "</div>";
+                studentField += "</div>";
+
+                studentFields.append(studentField);
+            }
+        }
+
+        $("#save").click(function (event) {
+            event.preventDefault();
+
+            var selectedGrade = $("#dropdown3").val();
+            var selectedSchool = $("#dropdown2").val();
+            var studentData = [];
+
+            // Collect student names
+            for (var i = 1; i <= numberOfStudents; i++) {
+                var studentName = $("#studentName" + i).val();
+                studentData.push({
+                    studentName: studentName,
+                });
+            }
+
+            // Send data to the API with both gradeName, schoolName, and cityName
+            $.ajax({
+                url:
+                        "http://localhost:8080/school-Hub/api/v1/student/save?gradeName=" +
+                        encodeURIComponent(selectedGrade) +
+                        "&schoolName=" +
+                        encodeURIComponent(selectedSchool) +
+                        "&cityName=" +
+                        encodeURIComponent(selectedCity), // Include selectedCity
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(studentData),
+                success: function (response) {
+                    showCustomAlert(
+                            "Success: Data saved successfully.",
+                            "alert-success"
+                    );
+                },
+                error: function (xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        showCustomAlert(
+                                "Error: " + xhr.responseJSON.message,
+                                "alert-danger"
+                        );
+                    } else {
+                        showCustomAlert(
+                                "Error: Data could not be saved.",
+                                "alert-danger"
+                        );
+                    }
+                    console.error(xhr);
+                },
+            });
+        });
+
+        function showCustomAlert(message, alertType) {
+            var customAlert = $("#customAlert");
+            var alertMessage = $("#alertMessage");
+
+            alertMessage.text(message);
+            customAlert
+                    .removeClass("alert-success alert-danger")
+                    .addClass(alertType);
+            customAlert.show();
+
+            // Hide the alert after 3 seconds
+            setTimeout(function () {
+                customAlert.hide();
+            }, 3000);
+        }
+
+        $("#dropdown1").change(function () {
+            var selectedCity = $(this).val();
+            populateSchoolDropdown(selectedCity);
+        });
+
+        $("#dropdown2").change(function () {
+            var selectedSchool = $(this).val();
+            populateGradeDropdown(selectedSchool);
+        });
+    });
+</script>
+  </body>
+</html>
